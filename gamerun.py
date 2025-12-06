@@ -1,8 +1,12 @@
+import os
 import tkinter as tk
 import tkinter.messagebox as messagebox
 import math
 from collections import deque
-from PIL import Image, ImageTk 
+from images.loadimage import load_images
+from algorithm import BFS
+
+
 
 # Grafo DIRECIONADO
 graph = {
@@ -27,9 +31,10 @@ positions = {
     "Aço": (150, 200)
 }
 
+
 player_node = "Fogo"  # nó inicial do jogador
 NODE_RADIUS = 45   # Raio do círculo
-IMG_SIZE = 60      # Tamanho do PNG final (em pixels)
+      # Tamanho do PNG final (em pixels)
 player_node = "Fogo"     # onde o jogador está AGORA
 start_node  = "Fogo"     # início do jogo
 end_node    = "Água"     # objetivo final
@@ -56,40 +61,8 @@ def check_game_state():
         messagebox.showerror("Game Over", "Você ficou preso!")
         root.destroy()
         return
-# BFS para o menor caminho
-def BFS(grafo, inicio, fim):
-    fila = deque([[inicio]])
-    visitado = set()
+    
 
-    while fila:
-        caminho = fila.popleft()
-        nodo = caminho[-1]
-
-        if nodo == fim:
-            return caminho  # achou o caminho mais curto
-
-        if nodo not in visitado:
-            visitado.add(nodo)
-            for viz in grafo[nodo]:
-                novo_caminho = list(caminho)
-                novo_caminho.append(viz)
-                fila.append(novo_caminho)
-
-    return None  # nenhum caminho
-
-
-
-# carrega imagens PNG e redimensiona
-def load_images():
-    images = {}
-    for node in graph.keys():
-        try:
-            img = Image.open(f"{node}.png")   # abre qualquer PNG
-            img = img.resize((IMG_SIZE, IMG_SIZE), Image.Resampling.LANCZOS)
-            images[node] = ImageTk.PhotoImage(img)
-        except Exception as e:
-            print(f"ERRO ao carregar {node}.png → {e}")
-    return images
 
 
 # Desenhar grafo
@@ -161,11 +134,12 @@ def on_click(event, images):
 # Janela principal
 root = tk.Tk()
 root.title("Pokegraph")
+load_images(graph)
 
 canvas = tk.Canvas(root, width=650, height=550, bg="white")
 canvas.pack()
 
-images = load_images()  # carrega e redimensiona PNGs com PIL
+images = load_images(graph)  # carrega e redimensiona PNGs com PIL
 
 canvas.bind("<Button-1>", lambda e: on_click(e, images))
 
